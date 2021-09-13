@@ -1,11 +1,13 @@
 
 /*!
- * layer - 通用 Web 弹出层组件
+ * layer - 通用 Web 弹出层组件（魔改版，新增 specialMark，防止不同的扩展使用 layer 时会有冲突的问题）
  * MIT Licensed 
  */
 
 ;!function(window, undefined){
 "use strict";
+
+var specialMark = '-***';
 
 var isLayui = window.layui && layui.define, $, win, ready = {
   getPath: function(){
@@ -261,7 +263,7 @@ Class.pt.vessel = function(conType, callback){
     config.shade ? ('<div class="'+ doms.SHADE +'" id="'+ doms.SHADE + times +'" times="'+ times +'" style="'+ ('z-index:'+ (zIndex-1) +'; ') +'"></div>') : '',
     
     //主体
-    '<div class="'+ doms[0] + (' layui-layer-'+ready.type[config.type]) + (((config.type == 0 || config.type == 2) && !config.shade) ? ' layui-layer-border' : '') + ' ' + (config.skin||'') +'" id="'+ doms[0] + times +'" type="'+ ready.type[config.type] +'" times="'+ times +'" showtime="'+ config.time +'" conType="'+ (conType ? 'object' : 'string') +'" style="z-index: '+ zIndex +'; width:'+ config.area[0] + ';height:' + config.area[1] + ';position:'+ (config.fixed ? 'fixed;' : 'absolute;') +'">'
+    '<div class="'+ doms[0] + (' layui-layer-'+ready.type[config.type]) + (((config.type == 0 || config.type == 2) && !config.shade) ? ' layui-layer-border' : '') + ' ' + (config.skin||'') +'" id="'+ doms[0] + specialMark + times +'" type="'+ ready.type[config.type] +'" times="'+ times +'" showtime="'+ config.time +'" conType="'+ (conType ? 'object' : 'string') +'" style="z-index: '+ zIndex +'; width:'+ config.area[0] + ';height:' + config.area[1] + ';position:'+ (config.fixed ? 'fixed;' : 'absolute;') +'">'
       + (conType && config.type != 2 ? '' : titleHTML)
       + '<div id="'+ (config.id||'') +'" class="layui-layer-content'+ ((config.type == 0 && config.icon !== -1) ? ' layui-layer-padding' :'') + (config.type == 3 ? ' layui-layer-loading'+config.icon : '') +'">'
         + (config.type == 0 && config.icon !== -1 ? '<i class="layui-layer-ico layui-layer-ico'+ config.icon +'"></i>' : '')
@@ -344,13 +346,13 @@ Class.pt.creat = function(){
       }() : function(){
         if(!content.parents('.'+doms[0])[0]){
           content.data('display', content.css('display')).show().addClass('layui-layer-wrap').wrap(html[1]);
-          $('#'+ doms[0] + times).find('.'+doms[5]).before(titleHTML);
+          $('#'+ doms[0] + specialMark + times).find('.'+doms[5]).before(titleHTML);
         }
       }();
     }() : body.append(html[1]);
     $('#'+ doms.MOVE)[0] || body.append(ready.moveElem = moveElem);
     
-    that.layero = $('#'+ doms[0] + times);
+    that.layero = $('#'+ doms[0] + specialMark + times);
     that.shadeo = $('#'+ doms.SHADE + times);
     
     config.scrollbar || doms.html.css('overflow', 'hidden').attr('layer-full', times);
@@ -407,7 +409,7 @@ Class.pt.creat = function(){
 
 //自适应
 Class.pt.auto = function(index){
-  var that = this, config = that.config, layero = $('#'+ doms[0] + index);
+  var that = this, config = that.config, layero = $('#'+ doms[0] + specialMark + index);
   
   if(config.area[0] === '' && config.maxWidth > 0){
     //为了修复IE7下一个让人难以理解的bug
@@ -803,7 +805,7 @@ window.layer = layer;
 //获取子iframe的DOM
 layer.getChildFrame = function(selector, index){
   index = index || $('.'+doms[4]).attr('times');
-  return $('#'+ doms[0] + index).find('iframe').contents().find(selector);  
+  return $('#'+ doms[0] + specialMark + index).find('iframe').contents().find(selector);  
 };
 
 //得到当前iframe层的索引，子iframe时使用
@@ -815,7 +817,7 @@ layer.getFrameIndex = function(name){
 layer.iframeAuto = function(index){
   if(!index) return;
   var heg = layer.getChildFrame('html', index).outerHeight();
-  var layero = $('#'+ doms[0] + index);
+  var layero = $('#'+ doms[0] + specialMark + index);
   var titHeight = layero.find(doms[1]).outerHeight() || 0;
   var btnHeight = layero.find('.'+doms[6]).outerHeight() || 0;
   layero.css({height: heg + titHeight + btnHeight});
@@ -824,12 +826,12 @@ layer.iframeAuto = function(index){
 
 //重置iframe url
 layer.iframeSrc = function(index, url){
-  $('#'+ doms[0] + index).find('iframe').attr('src', url);
+  $('#'+ doms[0] + specialMark + index).find('iframe').attr('src', url);
 };
 
 //设定层的样式
 layer.style = function(index, options, limit){
-  var layero = $('#'+ doms[0] + index)
+  var layero = $('#'+ doms[0] + specialMark + index)
   ,contElem = layero.find('.layui-layer-content')
   ,type = layero.attr('type')
   ,titHeight = layero.find(doms[1]).outerHeight() || 0
@@ -869,7 +871,7 @@ layer.style = function(index, options, limit){
 //最小化
 layer.min = function(index, options){
   options = options || {};
-  var layero = $('#'+ doms[0] + index)
+  var layero = $('#'+ doms[0] + specialMark + index)
   ,shadeo = $('#'+ doms.SHADE + index)
   ,titHeight = layero.find(doms[1]).outerHeight() || 0
   ,left = layero.attr('minLeft') || (181*ready.minIndex)+'px'
@@ -910,7 +912,7 @@ layer.min = function(index, options){
 
 //还原
 layer.restore = function(index){
-  var layero = $('#'+ doms[0] + index)
+  var layero = $('#'+ doms[0] + specialMark + index)
   ,shadeo = $('#'+ doms.SHADE + index)
   ,area = layero.attr('area').split(',')
   ,type = layero.attr('type');
@@ -936,7 +938,7 @@ layer.restore = function(index){
 
 //全屏
 layer.full = function(index){
-  var layero = $('#'+ doms[0] + index), timer;
+  var layero = $('#'+ doms[0] + specialMark + index), timer;
   ready.record(layero);
   if(!doms.html.attr('layer-full')){
     doms.html.css('overflow','hidden').attr('layer-full', index);
@@ -956,13 +958,13 @@ layer.full = function(index){
 
 //改变title
 layer.title = function(name, index){
-  var title = $('#'+ doms[0] + (index||layer.index)).find(doms[1]);
+  var title = $('#'+ doms[0] + specialMark + (index||layer.index)).find(doms[1]);
   title.html(name);
 };
 
 //关闭layer总方法
 layer.close = function(index, callback){
-  var layero = $('#'+ doms[0] + index), type = layero.attr('type'), closeAnim = 'layer-anim-close';
+  var layero = $('#'+ doms[0] + specialMark + index), type = layero.attr('type'), closeAnim = 'layer-anim-close';
   if(!layero[0]) return;
   var WRAP = 'layui-layer-wrap', remove = function(){
     if(type === ready.type[1] && layero.attr('conType') === 'object'){
